@@ -29,12 +29,13 @@ public:
 
     // --- Public Data Arrays (The SoA) ---
     // Exposing these directly is a key part of Data-Oriented Design.
+    // Hot data is grouped together for performance.
+    Vec3*       positions;  // 3D positions of the cells.
+    uint8*      energies;   // Current energy (e.g., 0-255).
     uint8*      flags;      // Bitmask: IsActive, IsDirty, etc.
     uint8*      typeIDs;    // ID pointing to an Archetype in the ArchetypeLibrary.
-    Vec3*       positions;  // 3D positions of the cells.
     Quaternion* rotations;  // 3D rotations of the cells.
     uint8*      healths;    // Current health (e.g., 0-255).
-    uint8*      energies;   // Current energy (e.g., 0-255).
 
     /**
      * @brief Constructs a CellBlock and allocates memory for a set capacity.
