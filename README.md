@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/your-logo-here.png" alt="Nexuss Biomimetic Engine Logo" width="150"/>
+  
   <h1>Nexuss Biomimetic Engine</h1>
   <p>
     <strong>A state-of-the-art, data-oriented, and massively parallel engine for simulating complex systems at an unprecedented scale.</strong>
