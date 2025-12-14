@@ -61,24 +61,21 @@ make benchmark_phase2
 
 An executable file named `benchmark_phase2` (or `.exe`) should now be present in the `/build/benchmark_phase2/` directory.
 
-### Step 3: Execute and Monitor the Benchmark
+### Step 3: Execute the Benchmark and Log Results
 
-1.  Open your system's memory monitoring tool and have it ready to observe the `benchmark_phase2` process.
-2.  Navigate to the executable's directory and run it.
+Navigate to the executable's directory. The `echo ""` command automatically handles the interactive "Press Enter" prompt, and the `>>` operator appends the output to the `benchmark_results.log` file in the project root.
 
-    ```bash
-    # From within the 'build' directory
-    cd benchmark_phase2
-    ./benchmark_phase2
-    ```
-3.  The program will spawn the initial cell population and pause. At the prompt `Press Enter to begin the benchmark...`, **record the initial memory usage**.
-4.  Press `Enter`. The 5-second stress test will begin.
-5.  **CRITICAL:** During these 5 seconds, **watch the memory usage graph/value**. It should fluctuate slightly but must not show a continuous, upward trend.
-6.  The test will complete and print the final results.
+```bash
+# From within the 'build' directory
+cd benchmark_phase2
+echo "" | ./benchmark_phase2 >> ../../benchmark_results.log
+```
 
-### Step 4: Record the Output
+While the test is running, it is still important to monitor the process's memory usage to check for leaks.
 
-Copy the entire output from the terminal. It will look similar to this:
+### Step 4: Verify the Output
+
+Check the contents of `benchmark_results.log` at the root of the project. The output for Phase 2 should be appended and look similar to this:
 
 ```
 --- BENCHMARK RESULTS ---

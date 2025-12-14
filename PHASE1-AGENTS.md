@@ -80,25 +80,19 @@ An executable file named `benchmark` (or `benchmark.exe` on Windows) should now 
 1.  Open your system's memory monitoring tool (Task Manager, `htop`, etc.).
 2.  Be prepared to observe the memory consumption of the `benchmark` process when it pauses.
 
-### Step 5: Execute the Benchmark
+### Step 5: Execute the Benchmark and Log Results
 
-Run the compiled executable from the `build` directory.
+Run the compiled executable. The `echo ""` command automatically handles the interactive "Press Enter" prompt, and the `>>` operator appends the output to the `benchmark_results.log` file in the project root.
 
 ```bash
 # From within the 'build' directory
 cd benchmark
-./benchmark
+echo "" | ./benchmark >> ../../benchmark_results.log
 ```
 
-The program will print setup information and then pause with the message:
-`NOTE: Please observe memory usage in your system's Task Manager now.`
-`Press Enter to begin the performance test...`
+### Step 6: Verify the Output
 
-At this point, **record the memory usage** of the process. After recording, press `Enter` to continue the test.
-
-### Step 6: Record the Output
-
-The program will complete the performance test and print the final results. Copy the entire output, which will look similar to this:
+Check the contents of `benchmark_results.log` at the root of the project. The output for Phase 1 should be appended and look similar to this:
 
 ```
 --- BENCHMARK RESULTS ---
