@@ -86,28 +86,33 @@ public:
 private:
     void InsertRecursive(uint32_t nodeIndex, const BoundingBox<double>& nodeBounds, const Vec3d& point, const T& data, uint32_t currentDepth)
     {
-        Node& node = m_nodes[nodeIndex];
+        // Do not store a reference to the node across potential vector reallocations.
+        // Access m_nodes[nodeIndex] directly.
 
-        if (node.isLeaf)
+        if (m_nodes[nodeIndex].isLeaf)
         {
             // If we've reached max depth, or if the new data is the same as the old,
             // we can't or don't need to subdivide further.
-            if (currentDepth >= m_maxDepth || node.data == data)
+            if (currentDepth >= m_maxDepth || m_nodes[nodeIndex].data == data)
             {
-                node.data = data; // Overwrite if different
+                m_nodes[nodeIndex].data = data; // Overwrite if different
                 return;
             }
 
             // --- Subdivide this leaf node into a branch ---
-            T oldData = node.data;
-            node.isLeaf = false;
-            node.childNodeIndices.fill(INVALID_NODE); // Prepare for new children
+            T oldData = m_nodes[nodeIndex].data;
+            m_nodes[nodeIndex].isLeaf = false;
+
+            // Manually construct the child array in the union's memory space.
+            new (&m_nodes[nodeIndex].childNodeIndices) std::array<uint32_t, ChildCount>();
 
             for (size_t i = 0; i < ChildCount; ++i)
             {
                 uint32_t childIndex = static_cast<uint32_t>(m_nodes.size());
-                m_nodes.emplace_back(oldData); // Create new children with the parent's old value
-                node.childNodeIndices[i] = childIndex;
+                // CRITICAL: emplace_back can invalidate references to vector elements.
+                m_nodes.emplace_back(oldData);
+                // CRITICAL: Must use the index to access the node, as its address may have changed.
+                m_nodes[nodeIndex].childNodeIndices[i] = childIndex;
             }
         }
         
@@ -134,7 +139,9 @@ private:
         childBounds.max.z = (point.z < center.z) ? center.z : nodeBounds.max.z;
         childIdx |= (point.z < center.z) ? 0 : 4;
         
-        InsertRecursive(node.childNodeIndices[childIdx], childBounds, point, data, currentDepth + 1);
+        // Read the child index *after* potential reallocations.
+        uint32_t childNodeIdx = m_nodes[nodeIndex].childNodeIndices[childIdx];
+        InsertRecursive(childNodeIdx, childBounds, point, data, currentDepth + 1);
     }
     
     T GetValueAtPointRecursive(uint32_t nodeIndex, const BoundingBox<double>& nodeBounds, const Vec3d& point) const

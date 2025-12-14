@@ -71,3 +71,50 @@ Speedup Factor: 2.37543x
 
 [RESULT] SUCCESS! Significant performance gain from parallelization.
 ====================================================
+====================================================
+  Genesis Engine: Phase G1 Benchmark
+  (Canvas & Blueprint Imprinter Validation)
+====================================================
+
+[SETUP] Creating test model file: cube.obj
+[TEST 1] Parsing 3D model...
+  - Vertices found: 8
+  - Polygons found: 6
+[RESULT] SUCCESS! Model parsed correctly.
+
+[TEST 2] Creating QuantumCanvas...
+[RESULT] SUCCESS! Canvas initialized.
+
+[TEST 3] Imprinting blueprint onto canvas...
+  - Imprinting took 137 ms.
+[RESULT] SUCCESS! Imprinting process completed.
+
+[TEST 4] Verifying canvas state...
+  - Value at center (should be -1.0): 1
+  - Value outside (should be 1.0): 1
+====================================================
+  Genesis Engine: Phase G1 Benchmark
+  (Canvas & Blueprint Imprinter Validation)
+====================================================
+
+[SETUP] Creating test model file: cube.obj
+[TEST 1] Parsing 3D model...
+  - Vertices found: 8
+  - Polygons found: 6
+[RESULT] SUCCESS! Model parsed correctly.
+
+[TEST 2] Creating QuantumCanvas...
+[RESULT] SUCCESS! Canvas initialized.
+
+[TEST 3] Imprinting blueprint onto canvas...
+  - Imprinting took 74 ms.
+[RESULT] SUCCESS! Imprinting process completed.
+
+[TEST 4] Verifying canvas state...
+  - Value at center (should be -1.0): -1
+  - Value outside (should be 1.0): 1
+[RESULT] SUCCESS! Canvas was correctly modified by the imprinter.
+
+====================================================
+  Phase G1 has been successfully validated.
+====================================================
