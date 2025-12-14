@@ -11,15 +11,8 @@
 #include "DataTypes.h"
 #include <cstddef> // For size_t
 #include <limits>  // For std::numeric_limits
+#include <vector>  // For the free list
 
-/**
- * @class CellBlock
- * @brief Manages a fixed-size block of memory for cell components using SoA.
- *
- * This class allocates parallel arrays for each cell attribute. By exposing the
- * raw data pointers, it allows external systems to perform highly efficient,
- * cache-friendly operations across large sets of cells.
- */
 class CellBlock
 {
 public:
@@ -28,38 +21,29 @@ public:
     static constexpr uint8 FLAG_ACTIVE = 1 << 0; // 00000001
 
     // --- Public Data Arrays (The SoA) ---
-    // Exposing these directly is a key part of Data-Oriented Design.
-    // Hot data is grouped together for performance.
-    Vec3*       positions;  // 3D positions of the cells.
-    uint8*      energies;   // Current energy (e.g., 0-255).
-    uint8*      flags;      // Bitmask: IsActive, IsDirty, etc.
-    uint8*      typeIDs;    // ID pointing to an Archetype in the ArchetypeLibrary.
-    Quaternion* rotations;  // 3D rotations of the cells.
-    uint8*      healths;    // Current health (e.g., 0-255).
+    uint8*      flags;
+    uint8*      typeIDs;
+    Vec3*       positions;
+    Quaternion* rotations;
+    uint8*      healths;
+    uint8*      energies;
 
-    /**
-     * @brief Constructs a CellBlock and allocates memory for a set capacity.
-     * @param capacity The maximum number of cells this block can hold.
-     */
     explicit CellBlock(size_t capacity);
-
-    /**
-     * @brief Destructor that deallocates all associated memory.
-     */
     ~CellBlock();
 
     /**
-     * @brief Activates the next available cell slot and returns its index.
-     * @return The index of the newly activated cell, or INVALID_INDEX if full.
+     * @brief Acquires a free slot in the block for a new cell.
+     * @details Pulls a recycled index from the internal free list or uses the
+     *          next available contiguous slot. Marks the slot as active.
+     * @return The index of the acquired slot, or INVALID_INDEX if the block is full.
      */
-    size_t ActivateCell();
+    size_t AcquireSlot();
 
     /**
-     * @brief Deactivates a cell at a given index.
-     * @details Uses the efficient "swap and pop" method to keep active cells contiguous.
-     * @param index The index of the cell to deactivate.
+     * @brief Releases a slot, marking it as inactive and available for recycling.
+     * @param index The index of the slot to release.
      */
-    void DeactivateCell(size_t index);
+    void ReleaseSlot(size_t index);
 
     /**
      * @brief Gets the number of currently active cells in the block.
@@ -73,7 +57,7 @@ public:
      */
     size_t GetCapacity() const { return m_capacity; }
 
-    // --- Disable copying and moving to prevent memory management issues ---
+    // --- Disable copying and moving ---
     CellBlock(const CellBlock&) = delete;
     CellBlock& operator=(const CellBlock&) = delete;
     CellBlock(CellBlock&&) = delete;
@@ -82,4 +66,6 @@ public:
 private:
     size_t m_capacity;
     size_t m_activeCount;
+    size_t m_highWaterMark; // The highest index ever used + 1.
+    std::vector<size_t> m_freeIndices; // A stack of recycled indices.
 };
