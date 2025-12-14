@@ -76,7 +76,8 @@ int main()
     // --- 4. IMPRINTING TEST ---
     std::cout << "[TEST 3] Imprinting blueprint onto canvas...\n";
     BlueprintImprinter imprinter;
-    int resolution = 32; // Voxelize the cube into a 32x32x32 grid
+    // With an odd resolution, a voxel will be perfectly centered at (0,0,0)
+    int resolution = 33;
 
     auto startTime = std::chrono::high_resolution_clock::now();
     imprinter.ImprintModel(canvas, model, resolution);
