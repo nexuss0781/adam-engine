@@ -1,4 +1,4 @@
-.# ===================================================================================
+# ===================================================================================
 #  File:    CMakeLists.txt
 #  Project: Adam Engine Benchmark (Phase 3)
 #  Purpose: Build script for the Phase 3 benchmark executable, which compares

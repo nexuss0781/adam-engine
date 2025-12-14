@@ -1,4 +1,4 @@
-.// ===================================================================================
+// ===================================================================================
 //  File:    Simulation.h
 //  Project: Adam Engine
 //  Purpose: Declares the Simulation class, the main orchestrator for the engine.

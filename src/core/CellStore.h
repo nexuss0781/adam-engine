@@ -62,4 +62,5 @@ private:
     std::vector<std::unique_ptr<CellBlock>> m_blocks;
     std::vector<LookupEntry> m_lookupTable;
     std::vector<uint32> m_freeHandleIDs;
+    std::vector<uint32> m_blocksWithFreeSlots;
 };

@@ -31,5 +31,5 @@ public:
      * @param cellStore A reference to the central repository of all cell data.
      * @param deltaTime The time in seconds that has passed since the last tick.
      */
-    void Update(CellStore& cellStore, float deltaTime) override;
+    void Update(CellBlock& block, float deltaTime) override;
 };

@@ -10,7 +10,7 @@
 
 // Forward declaration is used here to avoid including the full CellStore header.
 // This reduces compile times and prevents potential circular dependency issues.
-class CellStore;
+class CellBlock;
 
 /**
  * @class ISystem
@@ -37,5 +37,5 @@ public:
      * @param cellStore A reference to the central repository of all cell data.
      * @param deltaTime The time in seconds that has passed since the last tick.
      */
-    virtual void Update(CellStore& cellStore, float deltaTime) = 0;
+    virtual void Update(CellBlock& block, float deltaTime) = 0;
 };

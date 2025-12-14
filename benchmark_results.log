@@ -50,3 +50,24 @@ Throughput: 2430055 ops/sec
 [RESULT] SUCCESS! Memory is stable and throughput is high.
 Final active cell count: 1000000
 ===============================================
+====================================================
+  Adam Engine: Phase 3 Benchmark (Parallel Speedup)
+====================================================
+Total Cells: 1000000
+
+[SETUP] Initializing core systems...
+[SETUP] Using 3 worker threads.
+[SETUP] Registered 2 simulation systems.
+[SETUP] Spawned 1000000 cells.
+
+[BENCHMARK] Running SINGLE-THREADED simulation tick...
+Single-threaded time: 28.099 ms
+
+[BENCHMARK] Running MULTI-THREADED simulation tick...
+Multi-threaded time:  11.829 ms
+
+--- BENCHMARK RESULTS ---
+Speedup Factor: 2.37543x
+
+[RESULT] SUCCESS! Significant performance gain from parallelization.
+====================================================
