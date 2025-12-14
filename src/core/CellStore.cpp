@@ -17,9 +17,12 @@ CellStore::CellStore(size_t initialCapacity)
     {
         m_lookupTable.reserve(initialCapacity);
         const size_t numBlocks = (initialCapacity + DEFAULT_BLOCK_CAPACITY - 1) / DEFAULT_BLOCK_CAPACITY;
+        m_blocks.reserve(numBlocks);
+        m_blocksWithFreeSlots.reserve(numBlocks);
         for (size_t i = 0; i < numBlocks; ++i)
         {
             m_blocks.emplace_back(std::make_unique<CellBlock>(DEFAULT_BLOCK_CAPACITY));
+            m_blocksWithFreeSlots.push_back(static_cast<uint32>(i));
         }
     }
 }
@@ -44,29 +47,28 @@ CellHandle CellStore::CreateCell()
     CellLocation location;
     size_t slotIndex = CellBlock::INVALID_INDEX;
 
-    for (size_t i = 0; i < m_blocks.size(); ++i)
-    {
-        slotIndex = m_blocks[i]->AcquireSlot();
-        if (slotIndex != CellBlock::INVALID_INDEX)
-        {
-            location.blockIndex = static_cast<uint32>(i);
-            location.indexInBlock = static_cast<uint32>(slotIndex);
-            break;
-        }
-    }
-
     // If no existing block has space, create a new one.
-    if (slotIndex == CellBlock::INVALID_INDEX)
+    if (m_blocksWithFreeSlots.empty())
     {
         AddNewBlock();
-        location.blockIndex = static_cast<uint32>(m_blocks.size() - 1);
-        slotIndex = m_blocks.back()->AcquireSlot();
-        if (slotIndex == CellBlock::INVALID_INDEX)
-        {
-            // This should never happen unless capacity is 0.
-            throw std::runtime_error("Failed to acquire slot in a newly created block.");
-        }
-        location.indexInBlock = static_cast<uint32>(slotIndex);
+    }
+
+    // Get a block that has free slots and acquire a slot from it.
+    uint32 blockIndex = m_blocksWithFreeSlots.back();
+    slotIndex = m_blocks[blockIndex]->AcquireSlot();
+    if (slotIndex == CellBlock::INVALID_INDEX)
+    {
+        // This should never happen with the new logic.
+        throw std::runtime_error("Failed to acquire slot from a block that should have free slots.");
+    }
+
+    location.blockIndex = blockIndex;
+    location.indexInBlock = static_cast<uint32>(slotIndex);
+
+    // If the block is now full, remove it from the list of blocks with free slots.
+    if (m_blocks[blockIndex]->GetActiveCount() == m_blocks[blockIndex]->GetCapacity())
+    {
+        m_blocksWithFreeSlots.pop_back();
     }
 
     // Step 3: Update the lookup table with the new cell's location.
@@ -87,9 +89,19 @@ void CellStore::DestroyCell(CellHandle handle)
     // Step 1: Get the location from the lookup table.
     const auto& entry = m_lookupTable[handle.id];
     const auto& location = entry.location;
+    CellBlock* block = m_blocks[location.blockIndex].get();
+
+    // Check if the block was full before we release the slot.
+    const bool wasFull = (block->GetActiveCount() == block->GetCapacity());
 
     // Step 2: Release the slot in the appropriate CellBlock. This is now O(1).
-    m_blocks[location.blockIndex]->ReleaseSlot(location.indexInBlock);
+    block->ReleaseSlot(location.indexInBlock);
+
+    // If the block was full, it now has a free slot, so add it back to the list.
+    if (wasFull)
+    {
+        m_blocksWithFreeSlots.push_back(location.blockIndex);
+    }
 
     // Step 3: Invalidate the handle by incrementing the generation.
     // This is the key to preventing the ABA problem.
@@ -129,5 +141,7 @@ size_t CellStore::GetActiveCellCount() const
 
 void CellStore::AddNewBlock()
 {
+    uint32 newBlockIndex = static_cast<uint32>(m_blocks.size());
     m_blocks.emplace_back(std::make_unique<CellBlock>(DEFAULT_BLOCK_CAPACITY));
+    m_blocksWithFreeSlots.push_back(newBlockIndex);
 }
