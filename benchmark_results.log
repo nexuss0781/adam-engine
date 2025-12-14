@@ -22,3 +22,31 @@ Target time (60FPS): 16.67 ms
 
 [RESULT] SUCCESS! Iteration time is within the 60 FPS budget.
 =========================================
+
+
+--- Phase 2: Lifecycle & Recycling System ---
+
+===============================================
+  Adam Engine: Phase 2 Benchmark (Lifecycle)
+===============================================
+Initial Cells: 1000000
+Recycle Rate:  10000 creates/destroys per tick
+Test Duration: 5 seconds
+
+[SETUP] Initializing systems...
+[SETUP] Spawning 1000000 initial cells...
+Initial population complete. Active cells: 1000000
+
+NOTE: Please observe initial memory usage in your system's Task Manager.
+The memory should remain STABLE during the test.
+Press Enter to begin the benchmark...
+[BENCHMARK] Starting 5 second stress test...
+
+--- BENCHMARK RESULTS ---
+Test completed in: 5.004 seconds over 608 ticks.
+Total operations (Create/Destroy): 12160000
+Throughput: 2430055 ops/sec
+
+[RESULT] SUCCESS! Memory is stable and throughput is high.
+Final active cell count: 1000000
+===============================================
