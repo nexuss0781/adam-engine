@@ -90,10 +90,12 @@ int main()
         }
 
         // --- Destruction Phase ---
+        // --- Destruction Phase ---
         // Destroy a random subset of cells
-        std::uniform_int_distribution<size_t> distrib(0, live_handles.size() - 1);
         for (size_t i = 0; i < CELLS_TO_RECYCLE_PER_TICK; ++i)
         {
+            // The distribution MUST be created inside the loop, as the vector shrinks on each iteration.
+            std::uniform_int_distribution<size_t> distrib(0, live_handles.size() - 1);
             size_t randomIndex = distrib(gen);
             CellHandle handleToDestroy = live_handles[randomIndex];
             

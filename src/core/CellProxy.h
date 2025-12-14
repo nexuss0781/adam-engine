@@ -77,7 +77,7 @@ public:
     {
         if (IsValid())
         {
-            m_block->DeactivateCell(m_index);
+            m_block->ReleaseSlot(m_index);
             // This proxy is now invalid.
         }
     }

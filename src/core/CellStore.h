@@ -88,5 +88,6 @@ private:
 
     std::vector<std::unique_ptr<CellBlock>> m_blocks;
     std::vector<LookupEntry> m_lookupTable;
-    std::vector<uint32> m_freeHandleIDs; // A list of recycled IDs in the lookup table.
+    std::vector<uint32> m_freeHandleIDs;       // A list of recycled IDs in the lookup table.
+    std::vector<uint32> m_blocksWithFreeSlots; // Indices of blocks that are not full.
 };
