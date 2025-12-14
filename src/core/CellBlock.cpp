@@ -17,12 +17,12 @@ CellBlock::CellBlock(size_t capacity)
     : m_capacity(capacity), m_activeCount(0)
 {
     // C++17 aligned allocation. This is crucial for performance.
+    positions = new (std::align_val_t(MEMORY_ALIGNMENT)) Vec3[capacity];
+    energies  = new (std::align_val_t(MEMORY_ALIGNMENT)) uint8[capacity];
     flags     = new (std::align_val_t(MEMORY_ALIGNMENT)) uint8[capacity];
     typeIDs   = new (std::align_val_t(MEMORY_ALIGNMENT)) uint8[capacity];
-    positions = new (std::align_val_t(MEMORY_ALIGNMENT)) Vec3[capacity];
     rotations = new (std::align_val_t(MEMORY_ALIGNMENT)) Quaternion[capacity];
     healths   = new (std::align_val_t(MEMORY_ALIGNMENT)) uint8[capacity];
-    energies  = new (std::align_val_t(MEMORY_ALIGNMENT)) uint8[capacity];
 
     // Initialize all flags to inactive (0).
     std::memset(flags, 0, sizeof(uint8) * capacity);
@@ -31,12 +31,12 @@ CellBlock::CellBlock(size_t capacity)
 CellBlock::~CellBlock()
 {
     // C++17 aligned deallocation must be used to match allocation.
+    operator delete[](positions, std::align_val_t(MEMORY_ALIGNMENT));
+    operator delete[](energies,  std::align_val_t(MEMORY_ALIGNMENT));
     operator delete[](flags,     std::align_val_t(MEMORY_ALIGNMENT));
     operator delete[](typeIDs,   std::align_val_t(MEMORY_ALIGNMENT));
-    operator delete[](positions, std::align_val_t(MEMORY_ALIGNMENT));
     operator delete[](rotations, std::align_val_t(MEMORY_ALIGNMENT));
     operator delete[](healths,   std::align_val_t(MEMORY_ALIGNMENT));
-    operator delete[](energies,  std::align_val_t(MEMORY_ALIGNMENT));
 }
 
 size_t CellBlock::ActivateCell()
@@ -72,12 +72,12 @@ void CellBlock::DeactivateCell(size_t index)
     if (index != lastIndex)
     {
         // Swap all data components
+        positions[index] = positions[lastIndex];
+        energies[index]  = energies[lastIndex];
         flags[index]     = flags[lastIndex];
         typeIDs[index]   = typeIDs[lastIndex];
-        positions[index] = positions[lastIndex];
         rotations[index] = rotations[lastIndex];
         healths[index]   = healths[lastIndex];
-        energies[index]  = energies[lastIndex];
     }
     
     // Decrease the active count, effectively "popping" the last element.
